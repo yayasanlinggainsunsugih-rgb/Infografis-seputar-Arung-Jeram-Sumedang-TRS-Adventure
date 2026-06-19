@@ -1,506 +1,241 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplikasi TBM - Dikmas PNF Sumedang</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @media print {
-            nav, .no-print, button, #modal-input {
-                display: none !important;
-            }
-            body { background-color: white; padding: 0; }
-            main { max-width: 100% !important; width: 100% !important; padding: 0 !important; margin: 0 !important; }
-            .shadow-md { box-shadow: none !important; }
-            table { page-break-inside: auto; }
-            tr { page-break-inside: avoid; page-break-after: auto; }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TRS Adventures - Rafting Sungai Cipeles Sumedang</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Custom smooth scrolling */
+    html { scroll-behavior: smooth; }
+  </style>
 </head>
-<body class="bg-gray-100 font-sans">
+<body class="font-sans bg-gray-50 text-gray-800">
 
-    <nav class="bg-blue-700 text-white shadow-lg sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex items-center space-x-3">
-                    <i class="fa-solid fa-book-open text-2xl text-yellow-300"></i>
-                    <span class="font-bold text-lg tracking-wide">Dikmas PNF Sumedang (TBM)</span>
-                </div>
-                <div class="flex space-x-4">
-                    <button onclick="switchTab('beranda')" id="btn-beranda" class="px-4 py-2 rounded-md text-sm font-medium transition bg-blue-900 text-white">
-                        <i class="fa-solid fa-chart-pie mr-2"></i>Navbar 1: Beranda
-                    </button>
-                    <button onclick="switchTab('data-tbm')" id="btn-data-tbm" class="px-4 py-2 rounded-md text-sm font-medium transition hover:bg-blue-600 text-blue-100">
-                        <i class="fa-solid fa-table mr-2"></i>Navbar 2: Data TBM
-                    </button>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <main class="max-w-7xl mx-auto p-6 mt-4">
-
-        <div id="tab-beranda" class="space-y-6">
-            <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-blue-600">
-                <h1 class="text-2xl font-bold text-gray-800">Dashboard Visualisasi TBM Kabupaten Sumedang</h1>
-                <p class="text-gray-600 text-sm mt-1">Ringkasan grafis dinamis hasil sinkronisasi data master TBM.</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div class="bg-white p-6 rounded-xl shadow-md flex items-center space-x-4">
-                    <div class="p-4 bg-blue-100 text-blue-600 rounded-lg"><i class="fa-solid fa-building text-2xl"></i></div>
-                    <div>
-                        <p class="text-sm text-gray-500 font-medium">Total Lembaga</p>
-                        <p id="stat-total-tbm" class="text-2xl font-bold text-gray-800">0</p>
-                    </div>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow-md flex items-center space-x-4">
-                    <div class="p-4 bg-green-100 text-green-600 rounded-lg"><i class="fa-solid fa-users text-2xl"></i></div>
-                    <div>
-                        <p class="text-sm text-gray-500 font-medium">Rata-rata Anggota</p>
-                        <p id="stat-avg-anggota" class="text-2xl font-bold text-gray-800">0</p>
-                    </div>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow-md flex items-center space-x-4">
-                    <div class="p-4 bg-purple-100 text-purple-600 rounded-lg"><i class="fa-solid fa-user-tie text-2xl"></i></div>
-                    <div>
-                        <p class="text-sm text-gray-500 font-medium">Total Pengurus</p>
-                        <p id="stat-total-pengurus" class="text-2xl font-bold text-gray-800">0</p>
-                    </div>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow-md flex items-center space-x-4">
-                    <div class="p-4 bg-indigo-100 text-indigo-600 rounded-lg"><i class="fa-solid fa-book text-2xl"></i></div>
-                    <div>
-                        <p class="text-sm text-gray-500 font-medium">Rata-rata Buku</p>
-                        <p id="stat-avg-buku" class="text-2xl font-bold text-gray-800">0</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="bg-white p-6 rounded-xl shadow-md">
-                    <h3 class="text-md font-semibold text-gray-700 mb-4"><i class="fa-solid fa-map-location-dot mr-2 text-blue-500"></i>Jumlah TBM per Kecamatan (Warna Variatif)</h3>
-                    <div class="h-80"><canvas id="chartKecamatan"></canvas></div>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow-md">
-                    <h3 class="text-md font-semibold text-gray-700 mb-4"><i class="fa-solid fa-chart-bar mr-2 text-green-500"></i>Penduduk vs Koleksi Buku per Desa/Kel</h3>
-                    <div class="h-80"><canvas id="chartDesa"></canvas></div>
-                </div>
-            </div>
-        </div>
-
-        <div id="tab-data-tbm" class="hidden space-y-6">
-            <div class="bg-white p-6 rounded-xl shadow-md flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4">
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-800">Data Master TBM Se-Kabupaten Sumedang</h1>
-                    <p class="text-gray-600 text-sm mt-1">Kelola data TBM (Tambah, Edit, Hapus, Cetak, Backup JSON) secara realtime.</p>
-                </div>
-                <div class="flex flex-wrap items-center gap-3 no-print">
-                    <button onclick="clearAllData()" class="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm font-medium shadow transition flex items-center">
-                        <i class="fa-solid fa-trash-can mr-2"></i> Kosongkan & Reset Data
-                    </button>
-
-                    <button onclick="document.getElementById('file-import').click()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg text-sm font-medium shadow transition flex items-center">
-                        <i class="fa-solid fa-file-import mr-2"></i> Impor JSON
-                    </button>
-                    <input type="file" id="file-import" accept=".json" class="hidden" onchange="importJSON(event)">
-
-                    <button onclick="exportJSON()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-sm font-medium shadow transition flex items-center">
-                        <i class="fa-solid fa-file-export mr-2"></i> Ekspor JSON
-                    </button>
-
-                    <button onclick="openFormAdd()" class="bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg text-sm font-medium shadow transition flex items-center">
-                        <i class="fa-solid fa-plus mr-2"></i> Tambah Data TBM
-                    </button>
-                    <button onclick="window.print()" class="bg-gray-800 hover:bg-gray-900 text-white px-3 py-2 rounded-lg text-sm font-medium shadow transition flex items-center">
-                        <i class="fa-solid fa-print mr-2"></i> Cetak Laporan
-                    </button>
-                    <div class="bg-blue-50 text-blue-700 font-semibold px-4 py-2 rounded-lg border border-blue-200 text-sm">
-                        Total: <span id="total-lembaga">0</span> Lembaga
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-white rounded-xl shadow-md overflow-hidden">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse whitespace-nowrap">
-                        <thead>
-                            <tr class="bg-gray-800 text-white text-sm uppercase tracking-wider">
-                                <th class="p-4 text-center no-print">Aksi</th>
-                                <th class="p-4 text-center">No</th>
-                                <th class="p-4">Nama TBM</th>
-                                <th class="p-4">Nama Pimpinan</th>
-                                <th class="p-4">Alamat Lengkap</th>
-                                <th class="p-4 text-center">Tahun Berdiri</th>
-                                <th class="p-4">No. SK Pendirian</th>
-                                <th class="p-4 text-right">Penduduk Desa/Kel</th>
-                                <th class="p-4 text-right">Jumlah Anggota</th>
-                                <th class="p-4 text-right">Jumlah Pengurus</th>
-                                <th class="p-4 text-right">Koleksi Buku</th>
-                                <th class="p-4 text-right">Pengunjung /Bulan</th>
-                                <th class="p-4 text-right">Layanan /Minggu</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabel-body-tbm" class="text-gray-700 text-sm divide-y divide-gray-200"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <div id="modal-input" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden no-print">
-        <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl p-6 m-4 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center border-b pb-3 mb-4">
-                <h3 id="modal-title" class="text-xl font-bold text-gray-800">Form Data TBM</h3>
-                <button onclick="toggleModal(false)" class="text-gray-400 hover:text-gray-600 text-xl"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <form id="form-tbm" onsubmit="saveData(event)" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input type="hidden" id="form-index">
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Nama TBM</label>
-                    <input type="text" id="in-nama" required class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Nama Pimpinan</label>
-                    <input type="text" id="in-pimpinan" required class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Kecamatan</label>
-                    <select id="in-kecamatan" class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"></select>
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Nama Desa / Kelurahan</label>
-                    <input type="text" id="in-desa" required class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Tahun Berdiri</label>
-                    <input type="number" id="in-tahun" required class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">No SK Pendirian</label>
-                    <input type="text" id="in-sk" required class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Penduduk Desa/Kel</label>
-                    <input type="number" id="in-penduduk" required class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Jumlah Anggota</label>
-                    <input type="number" id="in-anggota" required class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Jumlah Pengurus</label>
-                    <input type="number" id="in-pengurus" required class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Koleksi Buku</label>
-                    <input type="number" id="in-buku" required class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Pengunjung /Bulan</label>
-                    <input type="number" id="in-pengunjung" required class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Layanan /Minggu</label>
-                    <input type="number" id="in-layanan" required class="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none">
-                </div>
-                <div class="md:col-span-2 flex justify-end space-x-3 border-t pt-4 mt-2">
-                    <button type="button" onclick="toggleModal(false)" class="px-4 py-2 border rounded text-gray-600 hover:bg-gray-100 text-sm">Batal</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-800 text-sm font-medium">Simpan Data</button>
-                </div>
-            </form>
-        </div>
+  <nav class="bg-slate-900/90 text-white backdrop-blur-md sticky top-0 z-50 px-6 py-4 shadow-md">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-2 font-bold text-xl tracking-wider text-orange-500">
+        <i class="fa-solid fa-rafting-id text-2xl"></i> TRS ADVENTURES
+      </div>
+      <div class="flex gap-6 text-sm font-medium text-gray-300">
+        <a href="#" class="hover:text-orange-500 transition">Home</a>
+        <a href="#paket" class="hover:text-orange-500 transition">Paket Trip</a>
+        <a href="#fitur" class="hover:text-orange-500 transition">Lokasi & Jalur</a>
+        <a href="#galeri" class="hover:text-orange-500 transition">Galeri</a>
+        <a href="#kontak" class="hover:text-orange-500 transition">Kontak Kami</a>
+      </div>
+      <a href="https://wa.me/6285220132008" target="_blank" class="bg-orange-500 hover:bg-orange-600 text-white font-bold px-5 py-2 rounded-full shadow-lg transition text-sm flex items-center gap-2">
+        Pesan Sekarang (WhatsApp)
+      </a>
     </div>
+  </nav>
 
-    <script>
-        const daftarKecamatan = [
-            'Sumedang Utara', 'Sumedang Selatan', 'Jatinangor', 'Tanjungsari', 'Cimalaka', 
-            'Wado', 'Rancakalong', 'Ujungjaya', 'Situraja', 'Paseh', 
-            'Ganeas', 'Pamulihan', 'Cibugel', 'Darmaraja', 'Cisitu', 
-            'Conggeang', 'Buahdua', 'Tanjungkerta', 'Tanjungmedar', 'Tomo', 
-            'Jatigede', 'Jatinunggal', 'Surian', 'Sukasari', 'Cisado', 'Cipaku'
-        ];
+  <header class="relative bg-cover bg-center h-[600px] flex items-center" style="background-image: linear-gradient(to right, rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.4)), url('images/hero-bg.jpg');">
+    <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-8 items-center w-full">
+      <div class="text-white space-y-6">
+        <h1 class="text-4xl md:text-5xl font-extrabold leading-tight">
+          Taklukkan Arus Sungai Cipeles, Rasakan Adrenalin Sesungguhnya di Sumedang!
+        </h1>
+        <p class="text-gray-300 text-lg leading-relaxed">
+          Destinasi wisata arung jeram terbaik di Sumedang bersama TRS Adventures. Aman, seru, dan profesional untuk pemula hingga profesional.
+        </p>
+        <div class="flex flex-wrap gap-4 pt-2">
+          <a href="#paket" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-6 py-3 rounded-md shadow-md transition">
+            Lihat Paket Wisata
+          </a>
+          <a href="https://wa.me/6285220132008" target="_blank" class="bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-3 rounded-md shadow-md transition flex items-center gap-2">
+            <i class="fa-brands fa-whatsapp text-xl"></i> Konsultasi Gratis via WA
+          </a>
+        </div>
+      </div>
+      <div class="hidden md:block">
+        <img src="image/Info Grafis.png" alt="Bascamp" class="rounded-2xl shadow-2xl border-4 border-white/10 object-cover h-[400px] w-full">
+      </div>
+    </div>
+  </header>
 
-        const warnaGrafik = [
-            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#C9CBCF', 
-            '#34D399', '#F59E0B', '#EF4444', '#EC4899', '#6366F1', '#14B8A6', '#F43F5E',
-            '#A855F7', '#06B6D4', '#84CC16', '#10B981', '#EAB308', '#3B82F6'
-        ];
+  <section id="fitur" class="py-20 max-w-7xl mx-auto px-6">
+    <h2 class="text-3xl font-bold text-center mb-16 relative">
+      Mengapa Harus di Sungai Cipeles Sumedang?
+      <span class="block w-24 h-1 bg-orange-500 mx-auto mt-4 rounded"></span>
+    </h2>
+    <div class="grid md:grid-cols-3 gap-10">
+      <div class="bg-white p-8 rounded-2xl shadow-xl text-center border-t-4 border-orange-500 hover:transform hover:-translate-y-2 transition duration-300">
+        <div class="text-orange-500 text-5xl mb-6">
+          <i class="fa-solid fa-water"></i>
+        </div>
+        <h3 class="text-xl font-bold mb-4">1. Arus yang Menantang & Eksotis</h3>
+        <p class="text-gray-600 text-sm leading-relaxed">
+          Arus yang menantang & eksotis aman dan memberikan sensasi jeram mendebarkan dengan pemandangan alam alami yang asri.
+        </p>
+      </div>
+      <div class="bg-white p-8 rounded-2xl shadow-xl text-center border-t-4 border-blue-500 hover:transform hover:-translate-y-2 transition duration-300">
+        <div class="text-blue-500 text-5xl mb-6">
+          <i class="fa-solid fa-road-circle-check"></i>
+        </div>
+        <h3 class="text-xl font-bold mb-4">2. Akses Strategis & Dekat Tol</h3>
+        <p class="text-gray-600 text-sm leading-relaxed">
+          Akses strategis & dekat Tol Cisumdawu, langsung keluar tol dekat dengan basecamp arung jeram kami. Mudah dijangkau.
+        </p>
+      </div>
+      <div class="bg-white p-8 rounded-2xl shadow-xl text-center border-t-4 border-amber-600 hover:transform hover:-translate-y-2 transition duration-300">
+        <div class="text-amber-600 text-5xl mb-6">
+          <i class="fa-solid fa-bowl-food"></i>
+        </div>
+        <h3 class="text-xl font-bold mb-4">3. Kuliner Khas Setelah Rafting ('Tahu Sumedang')</h3>
+        <p class="text-gray-600 text-sm leading-relaxed">
+          Kuliner khas disediakan setelah rafting: 'Tahu Sumedang' hangat yang renyah dan nikmat langsung dari tempatnya.
+        </p>
+      </div>
+    </div>
+  </section>
 
-        // 20 Data Awal Default
-        let defaultMaster = [
-            { namaTbm: 'TBM Bina Insani 1', pimpinan: 'Asep Saepudin', desa: 'Desa Situ', kecamatan: 'Sumedang Utara', tahunBerdiri: 2015, noSk: '421.9/SK-01/Disdik/2015', pendudukDesa: 3450, jumlahAnggota: 120, jumlahPengurus: 4, koleksiBuku: 1200, avgPengunjung: 85, layananMinggu: 5 },
-            { namaTbm: 'TBM Cahaya Ilmu 2', pimpinan: 'Siti Aminah', desa: 'Desa Kotakulon', kecamatan: 'Sumedang Selatan', tahunBerdiri: 2017, noSk: '421.9/SK-02/Disdik/2017', pendudukDesa: 4100, jumlahAnggota: 145, jumlahPengurus: 5, koleksiBuku: 1500, avgPengunjung: 98, layananMinggu: 6 },
-            { namaTbm: 'TBM Harapan Bangsa 3', pimpinan: 'Budi Hartono', desa: 'Desa Hegarmanah', kecamatan: 'Jatinangor', tahunBerdiri: 2016, noSk: '421.9/SK-03/Disdik/2016', pendudukDesa: 5200, jumlahAnggota: 210, jumlahPengurus: 6, koleksiBuku: 2100, avgPengunjung: 140, layananMinggu: 6 },
-            { namaTbm: 'TBM Pintar Bersama 4', pimpinan: 'Dewi Lestari', desa: 'Desa Jatihurip', kecamatan: 'Tanjungsari', tahunBerdiri: 2018, noSk: '421.9/SK-04/Disdik/2018', pendudukDesa: 2900, jumlahAnggota: 95, jumlahPengurus: 3, koleksiBuku: 950, avgPengunjung: 60, layananMinggu: 4 },
-            { namaTbm: 'TBM Tunas Karya 5', pimpinan: 'Eko Prasetyo', desa: 'Desa Cibeureum', kecamatan: 'Cimalaka', tahunBerdiri: 2014, noSk: '421.9/SK-05/Disdik/2014', pendudukDesa: 3100, jumlahAnggota: 110, jumlahPengurus: 4, koleksiBuku: 1100, avgPengunjung: 75, layananMinggu: 5 },
-            { namaTbm: 'TBM Wado Mandiri 6', pimpinan: 'Hendra Wijaya', desa: 'Desa Licin', kecamatan: 'Wado', tahunBerdiri: 2019, noSk: '421.9/SK-06/Disdik/2019', pendudukDesa: 2400, jumlahAnggota: 80, jumlahPengurus: 3, koleksiBuku: 850, avgPengunjung: 55, layananMinggu: 3 },
-            { namaTbm: 'TBM Gemar Membaca 7', pimpinan: 'Rinawati', desa: 'Desa Citali', kecamatan: 'Rancakalong', tahunBerdiri: 2020, noSk: '421.9/SK-07/Disdik/2020', pendudukDesa: 2750, jumlahAnggota: 130, jumlahPengurus: 4, koleksiBuku: 1350, avgPengunjung: 90, layananMinggu: 5 },
-            { namaTbm: 'TBM Ujungjaya Cerdas 8', pimpinan: 'Agus Setiawan', desa: 'Desa Mekarjaya', kecamatan: 'Ujungjaya', tahunBerdiri: 2015, noSk: '421.9/SK-08/Disdik/2015', pendudukDesa: 3300, jumlahAnggota: 115, jumlahPengurus: 4, koleksiBuku: 1250, avgPengunjung: 80, layananMinggu: 4 },
-            { namaTbm: 'TBM Situraja Berdaya 9', pimpinan: 'Yayan Suryana', desa: 'Desa Sukasari', kecamatan: 'Situraja', tahunBerdiri: 2021, noSk: '421.9/SK-09/Disdik/2021', pendudukDesa: 3800, jumlahAnggota: 160, jumlahPengurus: 5, koleksiBuku: 1650, avgPengunjung: 110, layananMinggu: 6 },
-            { namaTbm: 'TBM Paseh Kreatif 10', pimpinan: 'Ani Suryani', desa: 'Desa Pasirnanjung', kecamatan: 'Paseh', tahunBerdiri: 2016, noSk: '421.9/SK-10/Disdik/2016', pendudukDesa: 2950, jumlahAnggota: 105, jumlahPengurus: 3, koleksiBuku: 1000, avgPengunjung: 70, layananMinggu: 4 },
-            { namaTbm: 'TBM Ganeas Pintar 11', pimpinan: 'Dedi Mulyadi', desa: 'Desa Mekarmukti', kecamatan: 'Ganeas', tahunBerdiri: 2018, noSk: '421.9/SK-11/Disdik/2018', pendudukDesa: 2600, jumlahAnggota: 90, jumlahPengurus: 3, koleksiBuku: 900, avgPengunjung: 65, layananMinggu: 4 },
-            { namaTbm: 'TBM Pamulihan Asri 12', pimpinan: 'Iis Dahlia', desa: 'Desa Haurngombong', kecamatan: 'Pamulihan', tahunBerdiri: 2013, noSk: '421.9/SK-12/Disdik/2013', pendudukDesa: 4300, jumlahAnggota: 180, jumlahPengurus: 5, koleksiBuku: 1900, avgPengunjung: 125, layananMinggu: 5 },
-            { namaTbm: 'TBM Mandiri Cibugel 13', pimpinan: 'Cecep Gorbachev', desa: 'Desa Cipasang', kecamatan: 'Cibugel', tahunBerdiri: 2022, noSk: '421.9/SK-13/Disdik/2022', pendudukDesa: 2100, jumlahAnggota: 75, jumlahPengurus: 3, koleksiBuku: 700, avgPengunjung: 45, layananMinggu: 3 },
-            { namaTbm: 'TBM Darmaraja Makmur 14', pimpinan: 'Maman Abdurrahman', desa: 'Desa Tarunajaya', kecamatan: 'Darmaraja', tahunBerdiri: 2015, noSk: '421.9/SK-14/Disdik/2015', pendudukDesa: 3500, jumlahAnggota: 140, jumlahPengurus: 4, koleksiBuku: 1400, avgPengunjung: 95, layananMinggu: 5 },
-            { namaTbm: 'TBM Cisitu Sejahtera 15', pimpinan: 'Neneng Hasanah', desa: 'Desa Cigintung', kecamatan: 'Cisitu', tahunBerdiri: 2017, noSk: '421.9/SK-15/Disdik/2017', pendudukDesa: 2800, jumlahAnggota: 100, jumlahPengurus: 3, koleksiBuku: 1050, avgPengunjung: 68, layananMinggu: 4 },
-            { namaTbm: 'TBM Conggeang Mewangi 16', pimpinan: 'Toto Sunarto', desa: 'Desa Cacaban', kecamatan: 'Conggeang', tahunBerdiri: 2014, noSk: '421.9/SK-16/Disdik/2014', pendudukDesa: 3200, jumlahAnggota: 125, jumlahPengurus: 4, koleksiBuku: 1300, avgPengunjung: 82, layananMinggu: 5 },
-            { namaTbm: 'TBM Buahdua Hijau 17', pimpinan: 'Yana Mulyana', desa: 'Desa Bojongloa', kecamatan: 'Buahdua', tahunBerdiri: 2019, noSk: '421.9/SK-17/Disdik/2019', pendudukDesa: 3050, jumlahAnggota: 112, jumlahPengurus: 4, koleksiBuku: 1150, avgPengunjung: 74, layananMinggu: 4 },
-            { namaTbm: 'TBM Tanjungkerta Mulya 18', pimpinan: 'Dadang Suganda', desa: 'Desa Boros', kecamatan: 'Tanjungkerta', tahunBerdiri: 2016, noSk: '421.9/SK-18/Disdik/2016', pendudukDesa: 3600, jumlahAnggota: 135, jumlahPengurus: 4, koleksiBuku: 1380, avgPengunjung: 88, layananMinggu: 5 },
-            { namaTbm: 'TBM Tanjungmedar Lestari 19', pimpinan: 'Euis Karlina', desa: 'Desa Kertamukti', kecamatan: 'Tanjungmedar', tahunBerdiri: 2018, noSk: '421.9/SK-19/Disdik/2018', pendudukDesa: 2700, jumlahAnggota: 98, jumlahPengurus: 3, koleksiBuku: 980, avgPengunjung: 63, layananMinggu: 4 },
-            { namaTbm: 'TBM Tomo Pusat Ilmu 20', pimpinan: 'Oman Rohman', desa: 'Desa Marongge', kecamatan: 'Tomo', tahunBerdiri: 2015, noSk: '421.9/SK-20/Disdik/2015', pendudukDesa: 3900, jumlahAnggota: 150, jumlahPengurus: 5, koleksiBuku: 1600, avgPengunjung: 102, layananMinggu: 6 }
-        ];
+  <section id="paket" class="py-20 bg-gray-100">
+    <div class="max-w-7xl mx-auto px-6">
+      <h2 class="text-3xl font-bold text-center mb-16">
+        Pilihan Paket Trip
+        <span class="block w-24 h-1 bg-orange-500 mx-auto mt-4 rounded"></span>
+      </h2>
+      <div class="grid md:grid-cols-3 gap-8 items-stretch">
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col justify-between border border-gray-200">
+          <div class="bg-orange-500 p-6 text-white text-center">
+            <h3 class="text-2xl font-bold">Paket 1: Fun Rafting</h3>
+          </div>
+          <div class="p-8 text-center flex-grow space-y-4">
+            <span class="text-gray-500 text-sm block">Mulai dari</span>
+            <div class="text-3xl font-extrabold text-gray-900">Rp 250rb<span class="text-sm font-normal text-gray-500">/pax</span></div>
+            <p class="text-gray-600 text-sm pt-4 border-t border-gray-100">Cocok untuk pemula dan keluarga yang ingin menikmati pemandangan santai.</p>
+          </div>
+          <div class="p-6 bg-gray-50 border-t border-gray-100">
+            <a href="#" class="block text-center bg-orange-500 text-white font-bold py-3 rounded-lg hover:bg-orange-600 transition">Detailed Item</a>
+          </div>
+        </div>
 
-        let initialData = [...defaultMaster];
-        let chartKecInst, chartDesaInst;
+        <div class="bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col justify-between border-2 border-blue-600 transform scale-105 relative z-10">
+          <div class="bg-blue-600 text-white text-xs font-bold uppercase tracking-widest py-1.5 text-center">Paling Populer</div>
+          <div class="bg-slate-900 p-6 text-white text-center">
+            <h3 class="text-2xl font-bold">Paket 2: Adventure Trip</h3>
+          </div>
+          <div class="p-8 flex-grow space-y-4">
+            <div class="text-center">
+              <div class="text-3xl font-extrabold text-gray-900">Rp 350rb<span class="text-sm font-normal text-gray-500">/pax</span></div>
+            </div>
+            <ul class="text-gray-600 text-sm space-y-2.5 pt-4 border-t border-gray-100">
+              <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Pemandu Profesional & Safety Gear</li>
+              <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Arus Jeram Menantang</li>
+              <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Transport Lokal & Kelapa Muda</li>
+              <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Makan Siang + Tahu Sumedang</li>
+              <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Dokumentasi paket HDD</li>
+              <li><i class="fa-solid fa-check text-green-500 mr-2"></i> Asuransi + Medical service</li>
+            </ul>
+          </div>
+          <div class="p-6 bg-gray-50 border-t border-gray-100">
+            <a href="#" class="block text-center bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition">Detailed Item</a>
+          </div>
+        </div>
 
-        if(localStorage.getItem('tbm_data')) {
-            initialData = JSON.parse(localStorage.getItem('tbm_data'));
-        }
+        <div class="bg-white rounded-2xl shadow-lg overflow-hidden flex flex-col justify-between border border-gray-200">
+          <div class="bg-slate-800 p-6 text-white text-center">
+            <h3 class="text-2xl font-bold">Paket 3: Team Building</h3>
+          </div>
+          <div class="p-8 text-center flex-grow space-y-4">
+            <span class="text-gray-500 text-sm block">Rate dari</span>
+            <div class="text-3xl font-extrabold text-gray-900">Contact Us</div>
+            <p class="text-gray-600 text-sm pt-4 border-t border-gray-100">Didesain khusus untuk korporat, instansi, atau komunitas besar dengan games outbound.</p>
+          </div>
+          <div class="p-6 bg-gray-50 border-t border-gray-100">
+            <a href="#" class="block text-center bg-slate-800 text-white font-bold py-3 rounded-lg hover:bg-slate-900 transition">Corporate Theme</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        function saveToStorage() {
-            localStorage.setItem('tbm_data', JSON.stringify(initialData));
-        }
+  <section class="py-20 max-w-5xl mx-auto px-6 text-center">
+    <h2 class="text-3xl font-bold mb-16">Alur Petualangan</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 relative">
+      <div class="space-y-4">
+        <div class="w-16 h-16 bg-amber-500 text-white rounded-full flex items-center justify-center mx-auto text-xl font-bold shadow-lg">1</div>
+        <h4 class="font-bold text-sm">1. Booking Online</h4>
+      </div>
+      <div class="space-y-4">
+        <div class="w-16 h-16 bg-slate-800 text-white rounded-full flex items-center justify-center mx-auto text-xl font-bold shadow-lg">2</div>
+        <h4 class="font-bold text-sm">2. Briefing & Safety</h4>
+      </div>
+      <div class="space-y-4">
+        <div class="w-16 h-16 bg-orange-500 text-white rounded-full flex items-center justify-center mx-auto text-xl font-bold shadow-lg">3</div>
+        <h4 class="font-bold text-sm">3. Pengarungan</h4>
+      </div>
+      <div class="space-y-4">
+        <div class="w-16 h-16 bg-amber-600 text-white rounded-full flex items-center justify-center mx-auto text-xl font-bold shadow-lg">4</div>
+        <h4 class="font-bold text-sm">4. Kuliner & Santai</h4>
+      </div>
+    </div>
+  </section>
 
-        // FUNGSI UNTUK MENGOSONGKAN & REFRESH TOTAL TAMPILAN DATA SITEM
-        function clearAllData() {
-            if(confirm('Apakah Anda yakin ingin mengosongkan seluruh data? Tindakan ini akan menghapus semua list data di tabel dan dashboard.')) {
-                initialData = []; // Mengosongkan array data
-                saveToStorage();  // Simpan kondisi kosong ke local storage
-                renderTable();    // Segarkan isi tabel navbar 2
-                document.getElementById('form-tbm').reset(); // Pastikan form ikut kosong
-                alert('Seluruh data berhasil dikosongkan. Silakan tambah data baru atau impor file JSON.');
-            }
-        }
+  <section id="galeri" class="py-20 bg-gray-100">
+    <div class="max-w-7xl mx-auto px-6">
+      <h2 class="text-3xl font-bold text-center mb-16">Galeri & Testimoni</h2>
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="md:col-span-2 grid grid-cols-2 sm:grid-cols-3 gap-4">
+          
+          <img src="image/Basecamp.jpeg" alt="Basecamp.jpeg" class="rounded-xl shadow object-cover h-40 w-full hover:scale-105 transition">
+          <img src="image/Cek Dam.jpeg" alt="Galeri 2" class="rounded-xl shadow object-cover h-40 w-full hover:scale-105 transition">
+          <img src="image/Ig1.png" alt="Galeri 3" class="rounded-xl shadow object-cover h-40 w-full hover:scale-105 transition">
+          <img src="image/Sarbumi.jpeg" alt="Galeri 4" class="rounded-xl shadow object-cover h-40 w-full hover:scale-105 transition">
+          <img src="image/Sentig.jpeg" alt="Galeri 5" class="rounded-xl shadow object-cover h-40 w-full hover:scale-105 transition">
+          <img src="image/Start Point.jpeg" alt="Galeri 6" class="rounded-xl shadow object-cover h-40 w-full hover:scale-105 transition">
+        
+        </div>
+        <div class="bg-white p-6 rounded-2xl shadow-xl flex flex-col justify-between border border-gray-100">
+          <div class="space-y-4">
+            <div class="flex text-amber-500 gap-1 text-sm">
+              <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+            </div>
+            <p class="text-gray-600 text-sm italic leading-relaxed">
+              "Pengalaman luar biasa bersama keluarga! Track sungainya seru bgt dan aman buat pemula karena guidenya ramah & sigap. Bonus Tahu Sumedang setelah rafting beneran juara setelah lelah mengarung sungai!"
+            </p>
+          </div>
+          <div class="flex items-center gap-3 pt-6 border-t border-gray-100 mt-4">
+            <div class="w-10 h-10 rounded-full bg-orange-200 flex items-center justify-center font-bold text-orange-700">A</div>
+            <div>
+              <h5 class="font-bold text-sm">Andini</h5>
+              <span class="text-xs text-gray-400">Jakarta</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        function switchTab(tabName) {
-            const tabBeranda = document.getElementById('tab-beranda');
-            const tabDataTbm = document.getElementById('tab-data-tbm');
-            const btnBeranda = document.getElementById('btn-beranda');
-            const btnDataTbm = document.getElementById('btn-data-tbm');
+  <footer id="kontak" class="bg-slate-950 text-gray-400 text-sm pt-16 pb-6 relative overflow-hidden">
+    <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-3 gap-10 border-b border-gray-800 pb-12 mb-6">
+      <div class="space-y-4">
+        <h4 class="text-white font-bold text-base tracking-wide">Tentang Kami (TRS Adventures)</h4>
+        <p class="text-xs leading-relaxed text-gray-400">
+          Tahu Rafting Sumedang adalah penyedia jasa wisata arung jeram profesional demi keamanan dan kenyamanan liburan Anda. Dipandu oleh instruktur berpengalaman.
+        </p>
+      </div>
+      <div class="space-y-4">
+        <h4 class="text-white font-bold text-base tracking-wide">Contact / Social Media</h4>
+        <ul class="space-y-2 text-xs">
+          <li><i class="fa-brands fa-instagram text-orange-500 mr-2"></i> tahuraftingsumedang@gmail.com</li>
+          <li><i class="fa-solid fa-phone text-orange-500 mr-2"></i> 085220132008</li>
+        </ul>
+      </div>
+      <div class="space-y-4">
+        <h4 class="text-white font-bold text-base tracking-wide">Alamat Basecamp</h4>
+        <p class="text-xs leading-relaxed">
+          <i class="fa-solid fa-location-dot text-orange-500 mr-2"></i> Perum Dago Village F2 Rt 03/Rw 11 Desa Sukajaya Kec. Sumedang Selatan 45311
+        </p>
+      </div>
+    </div>
+    <div class="text-center text-xs text-gray-600">
+      &copy; 2026 Tahu Rafting Sumedang. All Rights Reserved.
+    </div>
+    <div class="absolute bottom-0 right-0 w-32 h-32 bg-orange-600 opacity-20 rounded-tl-full pointer-events-none"></div>
+  </footer>
 
-            if(tabName === 'beranda') {
-                tabBeranda.classList.remove('hidden');
-                tabDataTbm.classList.add('hidden');
-                btnBeranda.className = "px-4 py-2 rounded-md text-sm font-medium bg-blue-900 text-white";
-                btnDataTbm.className = "px-4 py-2 rounded-md text-sm font-medium text-blue-100 hover:bg-blue-600 transition";
-                updateDashboard();
-            } else {
-                tabBeranda.classList.add('hidden');
-                tabDataTbm.classList.remove('hidden');
-                btnDataTbm.className = "px-4 py-2 rounded-md text-sm font-medium bg-blue-900 text-white";
-                btnBeranda.className = "px-4 py-2 rounded-md text-sm font-medium text-blue-100 hover:bg-blue-600 transition";
-                renderTable();
-            }
-        }
-
-        function toggleModal(show) {
-            const modal = document.getElementById('modal-input');
-            if (show) modal.classList.remove('hidden');
-            else modal.classList.add('hidden');
-        }
-
-        const selectKec = document.getElementById('in-kecamatan');
-        daftarKecamatan.forEach(k => { selectKec.innerHTML += `<option value="${k}">${k}</option>`; });
-
-        function openFormAdd() {
-            document.getElementById('form-tbm').reset(); 
-            document.getElementById('form-index').value = ""; 
-            document.getElementById('modal-title').innerText = "Form Tambah Data TBM Baru";
-            toggleModal(true);
-        }
-
-        function openFormEdit(index) {
-            const item = initialData[index];
-            document.getElementById('form-index').value = index;
-            document.getElementById('in-nama').value = item.namaTbm;
-            document.getElementById('in-pimpinan').value = item.pimpinan;
-            document.getElementById('in-kecamatan').value = item.kecamatan;
-            document.getElementById('in-desa').value = item.desa;
-            document.getElementById('in-tahun').value = item.tahunBerdiri;
-            document.getElementById('in-sk').value = item.noSk;
-            document.getElementById('in-penduduk').value = item.pendudukDesa;
-            document.getElementById('in-anggota').value = item.jumlahAnggota;
-            document.getElementById('in-pengurus').value = item.jumlahPengurus;
-            document.getElementById('in-buku').value = item.koleksiBuku;
-            document.getElementById('in-pengunjung').value = item.avgPengunjung;
-            document.getElementById('in-layanan').value = item.layananMinggu;
-            
-            document.getElementById('modal-title').innerText = "Form Edit Data Lembaga TBM";
-            toggleModal(true);
-        }
-
-        function deleteData(index) {
-            if(confirm('Apakah Anda yakin ingin menghapus lembaga TBM ini?')) {
-                initialData.splice(index, 1);
-                saveToStorage();
-                renderTable();
-            }
-        }
-
-        function saveData(e) {
-            e.preventDefault();
-            const idx = document.getElementById('form-index').value;
-            
-            const newData = {
-                namaTbm: document.getElementById('in-nama').value,
-                pimpinan: document.getElementById('in-pimpinan').value,
-                kecamatan: document.getElementById('in-kecamatan').value,
-                desa: document.getElementById('in-desa').value,
-                tahunBerdiri: parseInt(document.getElementById('in-tahun').value),
-                noSk: document.getElementById('in-sk').value,
-                pendudukDesa: parseInt(document.getElementById('in-penduduk').value),
-                jumlahAnggota: parseInt(document.getElementById('in-anggota').value),
-                jumlahPengurus: parseInt(document.getElementById('in-pengurus').value),
-                koleksiBuku: parseInt(document.getElementById('in-buku').value),
-                avgPengunjung: parseInt(document.getElementById('in-pengunjung').value),
-                layananMinggu: parseInt(document.getElementById('in-layanan').value)
-            };
-
-            if(idx === "") {
-                initialData.push(newData);
-            } else {
-                initialData[idx] = newData;
-            }
-
-            saveToStorage();
-            toggleModal(false);
-            renderTable();
-        }
-
-        function renderTable() {
-            const tabelBody = document.getElementById('tabel-body-tbm');
-            let tableRows = '';
-            
-            if (initialData.length === 0) {
-                tableRows = `<tr><td colspan="13" class="p-8 text-center text-gray-400 italic">Data kosong. Silakan gunakan tombol Tambah Data atau Impor JSON.</td></tr>`;
-            } else {
-                initialData.forEach((item, index) => {
-                    tableRows += `
-                        <tr class="hover:bg-gray-50 transition">
-                            <td class="p-4 text-center no-print space-x-2">
-                                <button onclick="openFormEdit(${index})" class="bg-amber-500 hover:bg-amber-600 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-pen"></i></button>
-                                <button onclick="deleteData(${index})" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-xs"><i class="fa-solid fa-trash"></i></button>
-                            </td>
-                            <td class="p-4 text-center font-medium text-gray-500">${index + 1}</td>
-                            <td class="p-4 font-semibold text-blue-900">${item.namaTbm}</td>
-                            <td class="p-4">${item.pimpinan}</td>
-                            <td class="p-4">${item.desa}, Kec. ${item.kecamatan}, Kab. Sumedang</td>
-                            <td class="p-4 text-center">${item.tahunBerdiri}</td>
-                            <td class="p-4 text-xs font-mono text-gray-600">${item.noSk}</td>
-                            <td class="p-4 text-right font-medium">${item.pendudukDesa.toLocaleString('id-ID')}</td>
-                            <td class="p-4 text-right font-medium">${item.jumlahAnggota.toLocaleString('id-ID')}</td>
-                            <td class="p-4 text-right">${item.jumlahPengurus}</td>
-                            <td class="p-4 text-right text-green-700 font-semibold">${item.koleksiBuku.toLocaleString('id-ID')}</td>
-                            <td class="p-4 text-right">${item.avgPengunjung}</td>
-                            <td class="p-4 text-center"><span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded font-bold">${item.layananMinggu} Hari</span></td>
-                        </tr>
-                    `;
-                });
-            }
-            tabelBody.innerHTML = tableRows;
-            document.getElementById('total-lembaga').innerText = initialData.length;
-        }
-
-        function exportJSON() {
-            if(initialData.length === 0) { alert('Tidak ada data yang bisa diekspor.'); return; }
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(initialData, null, 2));
-            const downloadAnchor = document.createElement('a');
-            downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", "backup_data_tbm_sumedang.json");
-            document.body.appendChild(downloadAnchor);
-            downloadAnchor.click();
-            downloadAnchor.remove();
-        }
-
-        function importJSON(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const importedData = JSON.parse(e.target.result);
-                    if (Array.isArray(importedData)) {
-                        initialData = importedData;
-                        saveToStorage();
-                        renderTable();
-                        alert('Data JSON Berhasil Dimasukkan ke Aplikasi!');
-                    } else {
-                        alert('Format file JSON tidak valid.');
-                    }
-                } catch (err) {
-                    alert('Gagal membaca file JSON.');
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        function updateDashboard() {
-            const totalTbm = initialData.length;
-            let totalAnggota = 0, totalPengurus = 0, totalBuku = 0;
-
-            const kecCount = {};
-            daftarKecamatan.forEach(k => kecCount[k] = 0);
-
-            const desaChartData = { labels: [], penduduk: [], buku: [] };
-
-            initialData.forEach((item, index) => {
-                totalAnggota += item.jumlahAnggota;
-                totalPengurus += item.jumlahPengurus;
-                totalBuku += item.koleksiBuku;
-
-                if(kecCount[item.kecamatan] !== undefined) kecCount[item.kecamatan]++;
-
-                if (index < 6) {
-                    desaChartData.labels.push(item.desa);
-                    desaChartData.penduduk.push(item.pendudukDesa);
-                    desaChartData.buku.push(item.koleksiBuku);
-                }
-            });
-
-            document.getElementById('stat-total-tbm').innerText = totalTbm;
-            document.getElementById('stat-avg-anggota').innerText = totalTbm ? Math.round(totalAnggota / totalTbm) + " Orang" : "0";
-            document.getElementById('stat-total-pengurus').innerText = totalPengurus + " Orang";
-            document.getElementById('stat-avg-buku').innerText = totalTbm ? Math.round(totalBuku / totalTbm).toLocaleString('id-ID') + " Judul" : "0";
-
-            // Update Grafik Kecamatan
-            if(chartKecInst) chartKecInst.destroy();
-            const ctxKec = document.getElementById('chartKecamatan').getContext('2d');
-            const labelsKec = Object.keys(kecCount).filter(k => kecCount[k] > 0);
-            const dataKec = Object.values(kecCount).filter(v => v > 0);
-            const bgWarnaBatang = labelsKec.map((_, i) => warnaGrafik[i % warnaGrafik.length]);
-
-            chartKecInst = new Chart(ctxKec, {
-                type: 'bar',
-                data: {
-                    labels: labelsKec.length ? labelsKec : ['Tidak ada data'],
-                    datasets: [{ label: 'Jumlah TBM', data: dataKec.length ? dataKec : [0], backgroundColor: bgWarnaBatang }]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-
-            // Update Grafik Desa
-            if(chartDesaInst) chartDesaInst.destroy();
-            const ctxDesa = document.getElementById('chartDesa').getContext('2d');
-            chartDesaInst = new Chart(ctxDesa, {
-                type: 'bar',
-                data: {
-                    labels: desaChartData.labels.length ? desaChartData.labels : ['Tidak ada data'],
-                    datasets: [
-                        { label: 'Populasi Penduduk Alamat', data: desaChartData.penduduk.length ? desaChartData.penduduk : [0], backgroundColor: '#10b981' },
-                        { label: 'Koleksi Buku', data: desaChartData.buku.length ? desaChartData.buku : [0], backgroundColor: '#6366f1' }
-                    ]
-                },
-                options: { responsive: true, maintainAspectRatio: false }
-            });
-        }
-
-        // Render awal data saat pertama kali dimuat
-        updateDashboard();
-    </script>
 </body>
 </html>
